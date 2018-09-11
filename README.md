@@ -14,6 +14,7 @@ Table of Contents
 ---------------------
 Data Analysis
 	Pokemon Team
+	PID Controller
 
 Machine Learning
 	Digits
