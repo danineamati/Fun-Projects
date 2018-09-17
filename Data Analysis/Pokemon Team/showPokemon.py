@@ -66,19 +66,65 @@ def gameLoop():
 		pygame.draw.rect(window, (50,50,50), [margin, margin, \
 			windowW - margin * 2,windowL - margin * 2])
 
-		swampert = pictureSetUp("Pokemon_Images\\260Swampert.png", \
-														(left, upper))
-		latios = pictureSetUp("Pokemon_Images\\381Latios.png", \
-														(middle, upper))
-		#Causing an error to display
-		luxray = pictureSetUp("Pokemon_Images\\405Luxray.png", \
-														(right, upper))
-		castform = pictureSetUp("Pokemon_Images\\351Castform.png", \
-														(left, lower))
-		chandelure = pictureSetUp("Pokemon_Images\\609Chandelure.png", \
-														(middle, lower))
-		aegislash = pictureSetUp("Pokemon_Images\\681Aegislash.png", \
-														(right, lower))
+		Joseph = False
+		Daniel = False
+
+		if Joseph:
+			Team = {
+			'swampert': pictureSetUp("Pokemon_Images\\260Swampert.png", \
+															(left, upper)),
+			'latios': pictureSetUp("Pokemon_Images\\381Latios.png", \
+															(middle, upper)),
+			'luxray': pictureSetUp("Pokemon_Images\\405Luxray.png", \
+															(right, upper)),
+			'castform': pictureSetUp("Pokemon_Images\\351Castform.png", \
+															(left, lower)),
+			'chandelure': pictureSetUp("Pokemon_Images\\609Chandelure.png", \
+															(middle, lower)),
+			'aegislash': pictureSetUp("Pokemon_Images\\681Aegislash.png", \
+															(right, lower))}
+		elif Daniel:
+			Team = {
+			'venasaur': pictureSetUp("Pokemon_Images\\003Venusaur.png", \
+															(left, upper)),
+			'rayquaza': pictureSetUp("Pokemon_Images\\384Rayquaza.png", \
+															(middle, upper)),
+			'claydol': pictureSetUp("Pokemon_Images\\344Claydol.png", \
+															(right, upper)),
+			'gardevoir': pictureSetUp("Pokemon_Images\\282Gardevoir.png", \
+															(left, lower)),
+			'salemence': pictureSetUp("Pokemon_Images\\373Salamence.png", \
+															(middle, lower)),
+			'rapidash': pictureSetUp("Pokemon_Images\\078Rapidash.png", \
+															(right, lower))}
+		else:
+			Team = {
+			'charizard': pictureSetUp("Pokemon_Images\\006Charizard.png", \
+															(left, upper)),
+			'mewtwo': pictureSetUp("Pokemon_Images\\150Mewtwo.png", \
+															(middle, upper)),
+			'pikachu': pictureSetUp("Pokemon_Images\\025Pikachu-Original.png", \
+															(right, upper)),
+			'snorlax': pictureSetUp("Pokemon_Images\\143Snorlax.png", \
+															(left, lower)),
+			'pidgeot': pictureSetUp("Pokemon_Images\\018Pidgeot.png", \
+															(middle, lower)),
+			'eevee': pictureSetUp("Pokemon_Images\\133Eevee.png", \
+															(right, lower))}
+
+		# swampert = pictureSetUp("Pokemon_Images\\260Swampert.png", \
+		# 												(left, upper))
+		# latios = pictureSetUp("Pokemon_Images\\381Latios.png", \
+		# 												(middle, upper))
+		# #Causing an error to display
+		# luxray = pictureSetUp("Pokemon_Images\\405Luxray.png", \
+		# 												(right, upper))
+		# castform = pictureSetUp("Pokemon_Images\\351Castform.png", \
+		# 												(left, lower))
+		# chandelure = pictureSetUp("Pokemon_Images\\609Chandelure.png", \
+		# 												(middle, lower))
+		# aegislash = pictureSetUp("Pokemon_Images\\681Aegislash.png", \
+		# 												(right, lower))
 		#Causing an error to display
 
 		pygame.display.update()
