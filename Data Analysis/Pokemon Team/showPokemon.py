@@ -68,6 +68,7 @@ def gameLoop():
 
 		Joseph = False
 		Daniel = False
+		Daniel2 = True
 
 		if Joseph:
 			Team = {
@@ -83,6 +84,7 @@ def gameLoop():
 															(middle, lower)),
 			'aegislash': pictureSetUp("Pokemon_Images\\681Aegislash.png", \
 															(right, lower))}
+			#Causing an error to display
 		elif Daniel:
 			Team = {
 			'venasaur': pictureSetUp("Pokemon_Images\\003Venusaur.png", \
@@ -96,6 +98,20 @@ def gameLoop():
 			'salemence': pictureSetUp("Pokemon_Images\\373Salamence.png", \
 															(middle, lower)),
 			'rapidash': pictureSetUp("Pokemon_Images\\078Rapidash.png", \
+															(right, lower))}
+		elif Daniel2:
+			Team = {
+			'sceptile': pictureSetUp("Pokemon_Images\\254Sceptile.png", \
+															(left, upper)),
+			'rayquaza': pictureSetUp("Pokemon_Images\\384Rayquaza.png", \
+															(middle, upper)),
+			'claydol': pictureSetUp("Pokemon_Images\\344Claydol.png", \
+															(right, upper)),
+			'gardevoir': pictureSetUp("Pokemon_Images\\282Gardevoir.png", \
+															(left, lower)),
+			'noivern': pictureSetUp("Pokemon_Images\\715Noivern.png", \
+															(middle, lower)),
+			'bouffalant': pictureSetUp("Pokemon_Images\\626Bouffalant.png", \
 															(right, lower))}
 		else:
 			Team = {
@@ -112,20 +128,7 @@ def gameLoop():
 			'eevee': pictureSetUp("Pokemon_Images\\133Eevee.png", \
 															(right, lower))}
 
-		# swampert = pictureSetUp("Pokemon_Images\\260Swampert.png", \
-		# 												(left, upper))
-		# latios = pictureSetUp("Pokemon_Images\\381Latios.png", \
-		# 												(middle, upper))
-		# #Causing an error to display
-		# luxray = pictureSetUp("Pokemon_Images\\405Luxray.png", \
-		# 												(right, upper))
-		# castform = pictureSetUp("Pokemon_Images\\351Castform.png", \
-		# 												(left, lower))
-		# chandelure = pictureSetUp("Pokemon_Images\\609Chandelure.png", \
-		# 												(middle, lower))
-		# aegislash = pictureSetUp("Pokemon_Images\\681Aegislash.png", \
-		# 												(right, lower))
-		#Causing an error to display
+		
 
 		pygame.display.update()
 		clock.tick(60)
