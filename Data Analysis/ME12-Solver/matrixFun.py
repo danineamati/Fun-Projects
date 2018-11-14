@@ -67,7 +67,7 @@ def inputForces():
 def printResult(result):
 	print("############################")
 	print("###        Result        ###")
-	print("############################")
+	print("##############################")
 	for out in result:
 		print(out[0], " = ", out[1])
 
