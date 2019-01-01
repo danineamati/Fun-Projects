@@ -162,7 +162,8 @@ def test(numRows, numCols, numPlayers, threshold, verbose = False):
 
 	moves = ["South", "West", "South", "South", "West", "South", "East", \
 				"East", "North", "North", "South", "South", "West", "West", \
-				"South", "South", "West", "North"]
+				"South", "South", "West", "North", "West", "West", "West", \
+				"South", "West", "West", "West", "West", "North", "North"]
 	for move in moves:
 		if p1.checkMove(move):
 			p1.moveLocation(move)

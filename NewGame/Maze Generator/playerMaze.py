@@ -8,6 +8,7 @@ class playerMaze():
 		self.maze = maze
 		self.currLoc = startLoc # in the form (row, col)
 		self.visited = [startLoc] # Stores visited locations
+		self.canViewEnd = self.checkViewEnd()
 
 	def getCurrentLocation(self):
 		'''Returns current location.'''
@@ -18,6 +19,7 @@ class playerMaze():
 		locations.'''
 		self.visited.append(loc)
 		self.currLoc = loc
+		self.canViewEnd = self.checkViewEnd()
 
 	def moveLocation(self, direction):
 		'''Moves to new location given ['North', 'East', 'South', 'West'] 
@@ -33,6 +35,20 @@ class playerMaze():
 		'''Checks if player can move in given direction.'''
 		current_row, current_col = self.currLoc
 		return not self.maze.hasWall(current_row, current_col, direction)
+
+	def checkViewEnd(self):
+		'''Checks if the player can see or has seen the end. '''
+		# Check the adjacent locations to the end.
+		for direction in Direction:
+			adjacent = self.maze.getNeighborCell(self.maze.end[0], \
+								self.maze.end[1], direction)
+			# if the adjacent cell is the current location
+			# AND there is not wall in the way,
+			if adjacent == self.currLoc and \
+					not self.maze.hasWall(adjacent[0], adjacent[1], direction):
+				return True
+		# Otherwise, 
+		return False
 
 	def print(self):
 		'''Outputs the maze using simple ASCII-art to the specified output.
@@ -77,11 +93,11 @@ class playerMaze():
 		for r in range(self.maze.numRows):
 			current_row = ''
 
-			if (r, c) in self.visited and self.maze.hasWall(r, c, "West"):
+			if (r, 0) in self.visited and self.maze.hasWall(r, 0, "West"):
 				current_row += '|'
-			if c > 0 and (r, c - 1) in self.visited and \
-				self.maze.hasWall(r, c - 1, "East")	:
-				current_row += '|'
+			# if c > 0 and (r, c - 1) in self.visited and \
+			# 	self.maze.hasWall(r, c - 1, "East")	:
+			# 	current_row += '|'
 			else:
 				current_row += ' '
 			
@@ -90,7 +106,10 @@ class playerMaze():
 					current_row += print_cell(' P ', r, c)
 
 				elif (r, c) in self.visited:
-					current_row += print_cell(' V ', r, c)
+					current_row += print_cell(' - ', r, c)
+
+				elif self.canViewEnd and (r, c) == self.maze.end:
+					current_row += print_cell(' E ', r, c)
 
 				else:
 					current_row += print_cell('   ', r, c)
