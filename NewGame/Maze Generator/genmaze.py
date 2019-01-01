@@ -209,7 +209,9 @@ def genMaze(numRows, numCols, threshold, verbose = False):
 		
 		
 
-def main(numRows, numCols, numPlayers, threshold, verbose = False):
+def main(numRows, numCols, numPlayers, threshold, verbose = False,\
+			printMaze = True):
+	'''Wraps together all maze generation functions. '''
 
 	# We first want to generate the maze
 	m = genMaze(numRows, numCols, threshold, verbose)
@@ -230,10 +232,14 @@ def main(numRows, numCols, numPlayers, threshold, verbose = False):
 	for player in range(numPlayers):
 		playerCell = m.getCoordFromIndex(sharedCells[player])
 		m.start.append(playerCell)
-		print("Player {} starts at {}".format(player + 1,playerCell))
 
-	m.print(verbose = False)
+		if printMaze:
+			print("Player {} starts at {}".format(player + 1,playerCell))
 
+	if printMaze:
+		m.print(verbose = False)
+
+	return m
 
 
 def usage(name):
