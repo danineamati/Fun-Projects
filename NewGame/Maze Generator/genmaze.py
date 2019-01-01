@@ -57,7 +57,7 @@ def usage(name):
     print("n is an integer of total maze rows")
     print("f is an integer of total maze columns")
 
-def genMaze():
+def genMaze(threshold):
     ''' This function generates the maze'''
     if len(sys.argv) < 3:
         print("Too Few Arguments!")
@@ -68,14 +68,21 @@ def genMaze():
         usage()
 
     else:
-        m = Maze(int(sys.argv[1]), int(sys.argv[2]))
+        numRows = int(sys.argv[1])
+        numCols = int(sys.argv[2])
+        m = Maze(numRows, numCols)
         m.clear()
         m.setAllWalls()
         # m.setVisited(m.start[0], m.start[1])
         m.setVisited(m.end[0], m.end[1])
 
+        # threshold = (max(numRows, numCols) - min(numRows, numCols)) / 2
+        print(threshold)
+
+        counter = 10
+
         path = []
-        prevPaths = []
+        availPaths = []
 
         # Format = (coordinate, number of movement options)
         path.append((m.end, 1))
@@ -118,19 +125,38 @@ def genMaze():
             # There are no directions we can move from the current cell! We
             # need to backtrack.
             # Note option size cannot be negative.
-            if len(options) == 0:
+
+            if len(path) >= threshold:
+            	threshold += 1
+
+            	print(len(availPaths),
+                			"paths with threshold length ", threshold,
+                			" and Path lengths",\
+                				[len(thisPath) for thisPath in availPaths])
+
+            if len(options) == 0 or len(path) >= threshold:
                 # path.pop()
                 # In the new generator, we want to restart at the end and find
                 # the earliest location that had options.
                 # print("FINDING NEW PATH")
 
                 currentLen = len(path)
-                prevPaths.append(path)
-                # print("prevPaths:")
+                curr_Prev_len = len(availPaths)
+                availPaths.append(path)
+                availPaths.sort(key = lambda x : len(x))
+                # print("availPaths:")
 
-                # for num, pPath in enumerate(prevPaths):
+                # for num, pPath in enumerate(availPaths):
                 # 	print(num, pPath)
                 # print()
+                # if counter == 0:
+                # 	print(len(availPaths), "paths with Path lengths",\
+	               #  			[len(thisPath) for thisPath in availPaths])
+                # 	counter = 30
+                # else:
+                # 	counter -= 1
+
+                # print(len(availPaths))
 
                 for index, cell in enumerate(path):
                 	# print("Cell Iter:", index, cell)
@@ -143,20 +169,21 @@ def genMaze():
 
                 # If the path has not changed (gone through all possibilites),
                 if len(path) == currentLen:
-                	# print("PATH DRY")
-                	# prevPaths.pop()
-                	# if len(prevPaths) == 0:
-                	# 	print("NO PREV PATHS")
-                	# 	path = []
-                	# else:
-                	# 	# prevPaths.pop()
-                	# 	path = prevPaths.pop()
-                	# 	path.pop()
-                	while not len(prevPaths) == 0:
-                		path = prevPaths.pop()
+                	while not len(availPaths) == 0:
+                		# We want to choose the shortest current path
+                		path = availPaths.pop(0)
+                		# print(len(path))
+                		# or we could choose a random path
+                		# path = availPaths.pop(\
+                		# 	random.randint(0, len(availPaths) - 1))
                 		path.pop()
                 		if path != []:
                 			break
+                	# if (len(availPaths) > 2):
+                	# 		print(len(availPaths),
+                	# 		"paths with threshold length ", threshold,
+                	# 		" and Path lengths",\
+                	# 			[len(thisPath) for thisPath in availPaths])
 
                 # print("New Path:", path)
                 # print("---------------------------")
@@ -191,11 +218,12 @@ def genMaze():
 def main(numPlayers):
 
     # We first want to generate the maze
-    m = genMaze()
+    m = genMaze(5)
 
     m.print()
-    testlist = sorted(m.cellNumToExit)
-    print("Sorted List:", testlist[len(testlist):len(testlist) - 10:-1])
+    testlist = sorted(m.cellNumToExit, reverse = True)
+    # print("Sorted List:", testlist[len(testlist):len(testlist) - 10:-1])
+    print("Sorted List:", testlist[:15])
     print(findFurthestSharedCell(m))
 
     # Now we want to designate the start values given the results of the
