@@ -75,12 +75,15 @@ def genMaze():
         m.setVisited(m.end[0], m.end[1])
 
         path = []
+        prevPaths = []
 
-        path.append(m.end)
+        # Format = (coordinate, number of movement options)
+        path.append((m.end, 1))
+        print((m.end, 1))
 
         while not len(path) == 0:
             # Add current location to the path
-            (current_r, current_c) = path[len(path) - 1]
+            (current_r, current_c) = path[len(path) - 1][0]
 
                 
             # This list will contain the direction options to expand the 
@@ -108,34 +111,77 @@ def genMaze():
             # walls and locations that have already been visited.
             assert(len(options) <= 4)
 
+            # Update the number of options at the head
+            path[len(path) - 1] = ((current_r, current_c), len(options) - 1)
+
             # If options is empty (i.e surrounded by visited/walls):
             # There are no directions we can move from the current cell! We
             # need to backtrack.
             # Note option size cannot be negative.
             if len(options) == 0:
-                path.pop()
+                # path.pop()
+                # In the new generator, we want to restart at the end and find
+                # the earliest location that had options.
+                # print("FINDING NEW PATH")
+
+                currentLen = len(path)
+                prevPaths.append(path)
+                # print("prevPaths:")
+
+                # for num, pPath in enumerate(prevPaths):
+                # 	print(num, pPath)
+                # print()
+
+                for index, cell in enumerate(path):
+                	# print("Cell Iter:", index, cell)
+                	if cell[1] > 0:
+                		# This cell could have options
+                		path[index] = (cell[0], cell[1] - 1)
+                		path = path[:index + 2]
+                		# print("NEW HEAD FOUND")
+                		break
+
+                # If the path has not changed (gone through all possibilites),
+                if len(path) == currentLen:
+                	# print("PATH DRY")
+                	# prevPaths.pop()
+                	# if len(prevPaths) == 0:
+                	# 	print("NO PREV PATHS")
+                	# 	path = []
+                	# else:
+                	# 	# prevPaths.pop()
+                	# 	path = prevPaths.pop()
+                	# 	path.pop()
+                	while not len(prevPaths) == 0:
+                		path = prevPaths.pop()
+                		path.pop()
+                		if path != []:
+                			break
+
+                # print("New Path:", path)
+                # print("---------------------------")
 
             # Now we can continue the loop.
             else:
-
-            # Choose a random direction! Then, clear the wall in that 
-            # direction, and move into the next cell.
+	            # Choose a random direction! Then, clear the wall in that 
+	            # direction, and move into the next cell.
                 dir_rand = random.choice(options)
 
-            # Now, clear the wall in that direction and 
-            # move into the next cell.
+	            # Now, clear the wall in that direction and 
+	            # move into the next cell.
                 m.clearWall(current_r, current_c, dir_rand)
                 (next_row, next_col) = m.getNeighborCell(current_r, \
                                                          current_c, \
                                                          dir_rand)
 
-            # Mark the cell at next location as VISITED. 
-            # Note that START is already marked as VISITED.
+	            # Mark the cell at next location as VISITED. 
+	            # Note that START is already marked as VISITED.
                 m.setVisited(next_row, next_col)
                 m.setCellNum(next_row, next_col, len(path))
 
-            # Append next location onto the path.
-                path.append((next_row, next_col))
+                # Append next location onto the path.
+                # print(((next_row, next_col), len(options) - 1))
+                path.append(((next_row, next_col), len(options) - 1))
 
     # Return the competed maze
     return m

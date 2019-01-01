@@ -1,3 +1,6 @@
+import random
+
+
 MazeCell = ["Empty", "Wall", "Visited"]
 Direction = ["North", "East", "South", "West"]
 
@@ -10,7 +13,8 @@ class Maze:
         self.cellNumToExit = []
         self.clear()
         self.start = []
-        self.end = (rows - 1, columns - 1)
+        self.end = (random.randint(0, self.numRows - 1),\
+                                random.randint(0, self.numColumns - 1))
 
 
     def getExpArrayIndex(self, cellRow, cellColumn):
@@ -198,22 +202,20 @@ class Maze:
                     current_row += print_cell(' E ', r, c)
 
                 elif self.getCell(r, c) == "Empty":
-	                if verbose:
-	                    cellNum = self.getCellNum(r, c)
-	                    if cellNum < 10:
-	                    	cellNum = ' ' + str(cellNum)
-	                    current_row += print_cell('{} '.format(cellNum), r, c)
-	                else:
-	                	current_row += print_cell('   ', r, c)
+                    if verbose:
+                        cellNum = self.getCellNum(r, c)
+                        cellNum = ' ' * (3 - len(str(cellNum))) + str(cellNum)
+                        current_row += print_cell(cellNum, r, c)
+                    else:
+                        current_row += print_cell('   ', r, c)
 
                 elif self.getCell(r, c,) == "Visited":
-	                if verbose:
-	                    cellNum = self.getCellNum(r, c)
-	                    if cellNum < 10:
-	                    	cellNum = ' ' + str(cellNum)
-	                    current_row += print_cell('{} '.format(cellNum), r, c)
-	                else:
-	                	current_row += print_cell('   ', r, c)
+                    if verbose:
+                        cellNum = self.getCellNum(r, c)
+                        cellNum = ' ' * (3 - len(str(cellNum))) + str(cellNum)
+                        current_row += print_cell(cellNum, r, c)
+                    else:
+                        current_row += print_cell('   ', r, c)
                         
                 elif self.getCell(r, c,) == "Wall":
                     current_row += print_cell(' W ', r, c)
