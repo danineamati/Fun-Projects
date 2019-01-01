@@ -1,246 +1,268 @@
 from maze import *
 import random
 import sys
+import copy
 
 def addDirectionOption(Maze, row, column, direction, dir_list):
-    ''' Adds a direction to the list of possible directions'''
-    (neighbor_row, neighbor_col) = Maze.getNeighborCell(row, column, direction)
+	''' Adds a direction to the list of possible directions'''
+	(neighbor_row, neighbor_col) = Maze.getNeighborCell(row, column, direction)
 
-    if not Maze.isVisited(neighbor_row, neighbor_col):
-        dir_list.append(direction)
+	if not Maze.isVisited(neighbor_row, neighbor_col):
+		dir_list.append(direction)
 
 def numWalls(Maze, cellRow, cellCol):
-    ''' Check has number of walls'''
-    wall_num = 0
+	''' Check has number of walls'''
+	wall_num = 0
 
-    if Maze.hasWall(cellRow, cellCol, "North"):
-        wall_num += 1
-    if Maze.hasWall(cellRow, cellCol, "East"):
-        wall_num += 1
-    if Maze.hasWall(cellRow, cellCol, "South"):
-        wall_num += 1
-    if Maze.hasWall(cellRow, cellCol, "West"):
-        wall_num += 1
+	if Maze.hasWall(cellRow, cellCol, "North"):
+		wall_num += 1
+	if Maze.hasWall(cellRow, cellCol, "East"):
+		wall_num += 1
+	if Maze.hasWall(cellRow, cellCol, "South"):
+		wall_num += 1
+	if Maze.hasWall(cellRow, cellCol, "West"):
+		wall_num += 1
 
-    return wall_num
+	return wall_num
 
-def findFurthestSharedCell(Maze):
-    '''We want to find the furthest cell from the exit that appears more than
-    once. '''
-    # We first want to sort the list to put the higher numbers (cells further
-    # from the exit) at the front of the list
-    cellNumList = sorted(Maze.cellNumToExit)[::-1]
+def findFurthestSharedCell(Maze, numShare):
+	'''We want to find the furthest cell from the exit that appears more than
+	once. '''
+	# We first want to sort the list to put the higher numbers (cells further
+	# from the exit) at the front of the list
+	cellNumList = sorted(Maze.cellNumToExit)[::-1]
 
-    for cell in cellNumList:
-        # If the cell is repeated, then we found our candidate
-        if cellNumList.count(cell) >= 2:
-            return cell 
-    # If there is no candidate, then there is only one path in the entire
-    # maze. Notify the calling function.
-    return -1
+	for cell in cellNumList:
+		# If the cell is repeated, then we found our candidate
+		if cellNumList.count(cell) >= numShare:
+			return cell 
+	# If there is no candidate, then there is only one path in the entire
+	# maze. Notify the calling function.
+	return -1
+
+def findNumDirectionOptions(Maze, row, col):
+	'''Given a cell on the maze (described by a (row, col) coordinate), return
+	the number of options (North, South, East, West) that can be explored. '''
+	options = []
+			
+	# Check that there is room to the NORTH
+	if row > 0:
+		addDirectionOption(Maze, row, col, "North", options)
+
+	# Also check that there is room to the SOUTH
+	if row < Maze.numRows - 1:
+		addDirectionOption(Maze, row, col, "South", options)
+
+	# Also check that there is room to the WEST
+	if col > 0:
+		addDirectionOption(Maze, row, col, "West", options)
+
+	# Lastly, check that there is room to the EAST
+	if col < Maze.numColumns - 1:
+		addDirectionOption(Maze, row, col, "East", options)
+
+	# Now options should only a max of 4 options. These will exclude
+	# walls and locations that have already been visited.
+	assert(len(options) <= 4)
+	assert(len(options) >= 0)
+
+	return options
+
 
 def findAllIndices(inList, val):
-    '''Return a list of all the indices which contain the given value 'val' '''
-    indexList = []
+	'''Return a list of all the indices which contain the given value 'val' '''
+	indexList = []
 
-    for index, item in enumerate(inList):
-        if item == val:
-            indexList.append(index)
+	for index, item in enumerate(inList):
+		if item == val:
+			indexList.append(index)
 
-    return indexList
-        
+	return indexList
+
+def findNewHead(Maze, inList, verbose = False):
+	'''Takes in a list of the form [(row, col), ...] and finds the first list
+	wear the numOptions is greater than zero.'''
+	if inList == [] and verbose:
+		print("EMPTY LIST AS INPUT")
+
+	for index, coord in enumerate(inList):
+		r, c = coord
+		numOptions = len(findNumDirectionOptions(Maze, r, c))
+		if numOptions > 0:
+			# We have found a new head
+			if verbose:
+				print("NEW HEAD FOUND \t", coord, " with ",\
+							numOptions, " option(s)")
+			return inList[:index + 1]
+	# if there is no new head...
+	if verbose:
+		print("NO HEAD")
+
+	return []
+
+def findNewPath(Maze, availList, verbose = False):
+	'''Given the state of the maze and explored paths. It finds a new path if
+	possible.'''
+	# In the new generator, we want to restart at the end and find
+	# the earliest location that had options.
+	# print("FINDING NEW PATH")
+	
+	availList.sort(key = lambda x : len(x))
+
+	# print("Num Paths:" , len(availList))
+	iterList = copy.deepcopy(availList)
+
+	for possPath in iterList:
+		oldPath = copy.deepcopy(possPath)
+		newPath = findNewHead(Maze, possPath, verbose)	
+
+		if newPath != []:
+			availList.append(newPath)
+			return newPath
+
+		# If the path has not changed (gone through all possibilites),
+		# then the path is dry, can be removed and we need to consider
+		# a new path.
+		else:
+			availList.remove(oldPath)
+
+	return []
+
+
+
+def genMaze(numRows, numCols, threshold, verbose = False):
+	''' This function generates the maze'''
+	m = Maze(numRows, numCols)
+	m.clear()
+	m.setAllWalls()
+	m.setVisited(m.end[0], m.end[1])
+
+	path = []
+	availPaths = []
+	availPaths.append(path)
+
+	path.append(m.end)
+
+	while not len(path) == 0:
+		if (verbose):
+			print("Num Paths:" , len(availPaths))
+
+		# Add current location to the path
+		(current_r, current_c) = path[len(path) - 1]
+
+		# This list will contain the direction options to expand the 
+		# maze from the current Location.
+		# IMPORTANT: We want options to reset after every loop
+		options = findNumDirectionOptions(m, current_r, current_c)
+
+		# If options is empty (i.e. surrounded by visited/walls):
+		# There are no directions we can move from the current cell! We
+		# need to backtrack.
+		# Note: option size cannot be negative.
+		if len(options) == 0:
+			# In the new generator, we want to restart at the end and find
+			# the earliest location that had options.
+			if verbose:
+				print("FIXING DEAD END")
+			# path.pop()
+			path = findNewPath(m, availPaths, verbose)
+
+		# Now we can continue the loop.
+		else:
+			# Choose a random direction! Then, clear the wall in that 
+			# direction, and move into the next cell.
+			dir_rand = random.choice(options)
+
+			# Now, clear the wall in that direction and 
+			# move into the next cell.
+			m.clearWall(current_r, current_c, dir_rand)
+			(next_row, next_col) = m.getNeighborCell(current_r, \
+													 current_c, \
+													 dir_rand)
+
+			# Mark the cell at next location as VISITED. 
+			# Note that START is already marked as VISITED.
+			m.setVisited(next_row, next_col)
+			m.setCellNum(next_row, next_col, len(path))
+
+			# Append next location onto the path.
+			availPaths.remove(path)
+			path.append((next_row, next_col))
+			availPaths.append(path)
+
+
+			# If our path is now longer than the threshold, we need to 
+			# increase the threshold to allow exploration of the entire map.
+			if len(path) >= threshold:
+				if (verbose):
+					print("ADJUSTING THRESHOLD")
+				threshold += 1
+
+				# We want to switch to a shorter path.
+				availPaths.sort(key = lambda x : len(x))
+				path = findNewPath(m, availPaths, verbose)
+
+	if verbose:
+		print("Ending Number of paths:", len(availPaths))
+	# Return the competed maze
+	return m
+		
+		
+
+def main(numRows, numCols, numPlayers, threshold, verbose = False):
+
+	# We first want to generate the maze
+	m = genMaze(numRows, numCols, threshold, verbose)
+
+	if verbose:
+		m.print()
+	testlist = sorted(m.cellNumToExit, reverse = True)
+
+	if verbose:
+		print("Sorted List:", testlist[:15])
+		print(findFurthestSharedCell(m, numPlayers))
+
+	# Now we want to designate the start values given the results of the
+	# two shared locations that are furthest away.
+	furthestSharedNum = findFurthestSharedCell(m, numPlayers)
+	sharedCells = findAllIndices(m.cellNumToExit, furthestSharedNum)
+
+	for player in range(numPlayers):
+		playerCell = m.getCoordFromIndex(sharedCells[player])
+		m.start.append(playerCell)
+		print("Player {} starts at {}".format(player + 1,playerCell))
+
+	m.print(verbose = False)
+
 
 
 def usage(name):
-    ''' Show usage imformation for our program'''
-    print("usage:", name, "n f")
-    print("n is an integer of total maze rows")
-    print("f is an integer of total maze columns")
-
-def genMaze(threshold):
-    ''' This function generates the maze'''
-    if len(sys.argv) < 3:
-        print("Too Few Arguments!")
-        usage(sys.argv[0])
-
-    elif len(sys.argv) > 3:
-        print("Too Many Arguments!")
-        usage()
-
-    else:
-        numRows = int(sys.argv[1])
-        numCols = int(sys.argv[2])
-        m = Maze(numRows, numCols)
-        m.clear()
-        m.setAllWalls()
-        # m.setVisited(m.start[0], m.start[1])
-        m.setVisited(m.end[0], m.end[1])
-
-        # threshold = (max(numRows, numCols) - min(numRows, numCols)) / 2
-        print(threshold)
-
-        counter = 10
-
-        path = []
-        availPaths = []
-
-        # Format = (coordinate, number of movement options)
-        path.append((m.end, 1))
-        print((m.end, 1))
-
-        while not len(path) == 0:
-            # Add current location to the path
-            (current_r, current_c) = path[len(path) - 1][0]
-
-                
-            # This list will contain the direction options to expand the 
-            # maze from the current Location.
-            # IMPORTANT: We want options to reset after every loop
-            options = []
-            
-            # Check that there is room to the NORTH
-            if current_r > 0:
-                addDirectionOption(m, current_r, current_c, "North", options)
-
-            # Also check that there is room to the SOUTH
-            if current_r < m.numRows - 1:
-                addDirectionOption(m, current_r, current_c, "South", options)
-
-            # Also check that there is room to the WEST
-            if current_c > 0:
-                addDirectionOption(m, current_r, current_c, "West", options)
-
-            # Lastly, check that there is room to the EAST
-            if current_c < m.numColumns - 1:
-                addDirectionOption(m, current_r, current_c, "East", options)
-
-            # Now options should only a max of 4 options. These will exclude
-            # walls and locations that have already been visited.
-            assert(len(options) <= 4)
-
-            # Update the number of options at the head
-            path[len(path) - 1] = ((current_r, current_c), len(options) - 1)
-
-            # If options is empty (i.e surrounded by visited/walls):
-            # There are no directions we can move from the current cell! We
-            # need to backtrack.
-            # Note option size cannot be negative.
-
-            if len(path) >= threshold:
-            	threshold += 1
-
-            	print(len(availPaths),
-                			"paths with threshold length ", threshold,
-                			" and Path lengths",\
-                				[len(thisPath) for thisPath in availPaths])
-
-            if len(options) == 0 or len(path) >= threshold:
-                # path.pop()
-                # In the new generator, we want to restart at the end and find
-                # the earliest location that had options.
-                # print("FINDING NEW PATH")
-
-                currentLen = len(path)
-                curr_Prev_len = len(availPaths)
-                availPaths.append(path)
-                availPaths.sort(key = lambda x : len(x))
-                # print("availPaths:")
-
-                # for num, pPath in enumerate(availPaths):
-                # 	print(num, pPath)
-                # print()
-                # if counter == 0:
-                # 	print(len(availPaths), "paths with Path lengths",\
-	               #  			[len(thisPath) for thisPath in availPaths])
-                # 	counter = 30
-                # else:
-                # 	counter -= 1
-
-                # print(len(availPaths))
-
-                for index, cell in enumerate(path):
-                	# print("Cell Iter:", index, cell)
-                	if cell[1] > 0:
-                		# This cell could have options
-                		path[index] = (cell[0], cell[1] - 1)
-                		path = path[:index + 2]
-                		# print("NEW HEAD FOUND")
-                		break
-
-                # If the path has not changed (gone through all possibilites),
-                if len(path) == currentLen:
-                	while not len(availPaths) == 0:
-                		# We want to choose the shortest current path
-                		path = availPaths.pop(0)
-                		# print(len(path))
-                		# or we could choose a random path
-                		# path = availPaths.pop(\
-                		# 	random.randint(0, len(availPaths) - 1))
-                		path.pop()
-                		if path != []:
-                			break
-                	# if (len(availPaths) > 2):
-                	# 		print(len(availPaths),
-                	# 		"paths with threshold length ", threshold,
-                	# 		" and Path lengths",\
-                	# 			[len(thisPath) for thisPath in availPaths])
-
-                # print("New Path:", path)
-                # print("---------------------------")
-
-            # Now we can continue the loop.
-            else:
-	            # Choose a random direction! Then, clear the wall in that 
-	            # direction, and move into the next cell.
-                dir_rand = random.choice(options)
-
-	            # Now, clear the wall in that direction and 
-	            # move into the next cell.
-                m.clearWall(current_r, current_c, dir_rand)
-                (next_row, next_col) = m.getNeighborCell(current_r, \
-                                                         current_c, \
-                                                         dir_rand)
-
-	            # Mark the cell at next location as VISITED. 
-	            # Note that START is already marked as VISITED.
-                m.setVisited(next_row, next_col)
-                m.setCellNum(next_row, next_col, len(path))
-
-                # Append next location onto the path.
-                # print(((next_row, next_col), len(options) - 1))
-                path.append(((next_row, next_col), len(options) - 1))
-
-    # Return the competed maze
-    return m
-        
-        
-
-def main(numPlayers):
-
-    # We first want to generate the maze
-    m = genMaze(5)
-
-    m.print()
-    testlist = sorted(m.cellNumToExit, reverse = True)
-    # print("Sorted List:", testlist[len(testlist):len(testlist) - 10:-1])
-    print("Sorted List:", testlist[:15])
-    print(findFurthestSharedCell(m))
-
-    # Now we want to designate the start values given the results of the
-    # two shared locations that are furthest away.
-    furthestSharedNum = findFurthestSharedCell(m)
-    sharedCells = findAllIndices(m.cellNumToExit, furthestSharedNum)
-
-    for player in range(numPlayers):
-        playerCell = m.getCoordFromIndex(sharedCells[player])
-        m.start.append(playerCell)
-        # indexNum = m.cellNumToExit.index(furthestSharedNum)
-        # playerCell = m.getCoordFromIndex(indexNum)
-        # m.start.append(playerCell)
-        print(playerCell)
-
-    m.print(verbose = False)
+	''' Show usage imformation for our program'''
+	print("usage:", name, "n f p t")
+	print("n is an integer of total maze rows")
+	print("f is an integer of total maze columns")
+	print("p is an integer of number of players")
+	print("t is an integer of threshold length in maze generation")
 
 
 if __name__ == '__main__':
-    main(2)
+
+	if len(sys.argv) < 3:
+		print("Too Few Arguments!")
+		usage(sys.argv[0])
+	else:
+		if len(sys.argv) >= 3:
+			numRows = int(sys.argv[1])
+			numCols = int(sys.argv[2])
+
+		if len(sys.argv) > 3:
+			numPlayers = int(sys.argv[3])
+		else:
+			numPlayers = 2
+
+		if len(sys.argv) > 4:
+			threshold = int(sys.argv[4])
+		else:
+			threshold = 10
+ 
+		main(numRows, numCols, numPlayers, threshold, False)
