@@ -16,6 +16,11 @@ class Maze:
         self.end = (random.randint(0, self.numRows - 1),\
                                 random.randint(0, self.numColumns - 1))
 
+    def saveMaze(self, fileName):
+        pass
+
+    def loadMaze(self, fileName):
+        pass
 
     def getExpArrayIndex(self, cellRow, cellColumn):
         '''Take 2D coordinates and compute the corresponding 1D array index.

@@ -10,6 +10,12 @@ class playerMaze():
 		self.visited = [startLoc] # Stores visited locations
 		self.canViewEnd = self.checkViewEnd()
 
+	def savePlayerMaze(self, fileName):
+        pass
+
+    def loadPlayerMaze(self, fileName):
+        pass
+
 	def getCurrentLocation(self):
 		'''Returns current location.'''
 		return self.currLoc
