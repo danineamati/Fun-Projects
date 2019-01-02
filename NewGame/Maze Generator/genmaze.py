@@ -209,7 +209,7 @@ def genMaze(numRows, numCols, threshold, verbose = False):
 		
 		
 
-def main(numRows, numCols, numPlayers, threshold, verbose = False,\
+def main(numRows, numCols, numPlayers, threshold, coinPercent, verbose = False,\
 			printMaze = True):
 	'''Wraps together all maze generation functions. '''
 
@@ -235,6 +235,8 @@ def main(numRows, numCols, numPlayers, threshold, verbose = False,\
 
 		if printMaze:
 			print("Player {} starts at {}".format(player + 1,playerCell))
+
+	m.setCoin(coinPercent)
 
 	if printMaze:
 		m.print(verbose = False)
@@ -267,8 +269,13 @@ if __name__ == '__main__':
 			numPlayers = 2
 
 		if len(sys.argv) > 4:
-			threshold = int(sys.argv[4])
+			coinPercent = float(sys.argv[4])	
+		else:
+			coinPercent = 0.05
+
+		if len(sys.argv) > 5:
+			threshold = int(sys.argv[5])
 		else:
 			threshold = 10
  
-		main(numRows, numCols, numPlayers, threshold, False)
+		main(numRows, numCols, numPlayers, threshold, coinPercent, False)
