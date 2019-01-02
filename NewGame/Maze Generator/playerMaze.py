@@ -11,10 +11,10 @@ class playerMaze():
 		self.canViewEnd = self.checkViewEnd()
 
 	def savePlayerMaze(self, fileName):
-        pass
+		pass
 
-    def loadPlayerMaze(self, fileName):
-        pass
+	def loadPlayerMaze(self, fileName):
+		pass
 
 	def getCurrentLocation(self):
 		'''Returns current location.'''
