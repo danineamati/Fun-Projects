@@ -55,30 +55,33 @@ def open_cal():
 				# event.end = component.get('dtend')
 				event.url = component.get('URL')
 
-				datastring = component.to_ical().decode("utf-8")
-				# now we want to find the string
-				dtstart_index = datastring.find('DTSTART')
-				dtstart_start = datastring.find(':', dtstart_index)
-				dtstart_end = datastring.find('\r', dtstart_index)
+				event.start = component.get('DTSTART')
+				print(event.start)
 
-				date = datastring[int(dtstart_start) + 1: int(dtstart_end)]
-				# print(date)
-				try:
-					event.start = vDatetime.from_ical(date)
-				except ValueError as e:
-					print(e)
+				# datastring = component.to_ical().decode("utf-8")
+				# # now we want to find the string
+				# dtstart_index = datastring.find('DTSTART')
+				# dtstart_start = datastring.find(':', dtstart_index)
+				# dtstart_end = datastring.find('\r', dtstart_index)
 
-				# now we want to find the string
-				dtend_index = datastring.find('DTEND', dtstart_end)
-				dtend_start = datastring.find(':', dtend_index)
-				dtend_end = datastring.find('\r', dtend_index)
+				# date = datastring[int(dtstart_start) + 1: int(dtstart_end)]
+				# # print(date)
+				# try:
+				# 	event.start = vDatetime.from_ical(date)
+				# except ValueError as e:
+				# 	print(e)
 
-				date = datastring[int(dtend_start) + 1: int(dtend_end)]
-				# print(date)
-				try:
-					event.start = vDatetime.from_ical(date)
-				except ValueError as e:
-					print(e)
+				# # now we want to find the string
+				# dtend_index = datastring.find('DTEND', dtstart_end)
+				# dtend_start = datastring.find(':', dtend_index)
+				# dtend_end = datastring.find('\r', dtend_index)
+
+				# date = datastring[int(dtend_start) + 1: int(dtend_end)]
+				# # print(date)
+				# try:
+				# 	event.start = vDatetime.from_ical(date)
+				# except ValueError as e:
+				# 	print(e)
 				
 
 				events.append(event)
